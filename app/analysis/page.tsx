@@ -5,28 +5,42 @@ import AnimatedBackground from "@/components/animated-background";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+
+interface Post {
+  post_id: string;
+  type: string;
+  likes_count: number;
+  comments_count: number;
+  description: string;
+  date_time: number;
+  media_url: string;
+}
 
 export default function AnalysisPage() {
   const searchParams = useSearchParams();
   const username = searchParams ? searchParams.get("username") : null;
   const router = useRouter();
 
+  const [posts, setPosts] = useState<Post[]>([]);
+
   const handleClick = async (username: string) => {
-    const a = await fetch("/api/scrape", {
+    const response = await fetch("/api/scrape", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ username }),
+      body: JSON.stringify({ userId: username }),
     });
-    console.log(await a.json());
+    const data = await response.json();
+    console.log(data);
+    setPosts(data);
   };
 
-  
-
   useEffect(() => {
-    handleClick(username as string);
+    if (username) {
+      handleClick(username as string);
+    }
   }, [username]);
 
   return (
@@ -80,6 +94,45 @@ export default function AnalysisPage() {
                 opportunities.
               </p>
             </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-black">
+              <thead>
+                <tr>
+                  <th className="py-2">Post ID</th>
+                  <th className="py-2">Type</th>
+                  <th className="py-2">Likes Count</th>
+                  <th className="py-2">Comments Count</th>
+                  <th className="py-2">Description</th>
+                  <th className="py-2">Date Time</th>
+                  <th className="py-2">Media URL</th>
+                </tr>
+              </thead>
+              <tbody>
+                {posts.map((post) => (
+                  <tr key={post.post_id}>
+                    <td className="py-2">{post.post_id}</td>
+                    <td className="py-2">{post.type}</td>
+                    <td className="py-2">{post.likes_count}</td>
+                    <td className="py-2">{post.comments_count}</td>
+                    <td className="py-2">{post.description}</td>
+                    <td className="py-2">
+                      {new Date(post.date_time * 1000).toLocaleString()}
+                    </td>
+                    <td className="py-2">
+                      <a
+                        href={post.media_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        View Media
+                      </a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
