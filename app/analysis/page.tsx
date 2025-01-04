@@ -3,7 +3,15 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
-import { ArrowLeft, Download, Filter, ImageIcon, Loader2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Download,
+  Filter,
+  ImageIcon,
+  Loader2,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 
 import AnimatedBackground from "@/components/animated-background";
 import { Button } from "@/components/ui/button";
@@ -57,6 +65,7 @@ export default function AnalysisPage() {
   const [selectedType, setSelectedType] = useState("all");
   const [posts, setPosts] = useState<Post[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [isTableVisible, setIsTableVisible] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -155,13 +164,19 @@ export default function AnalysisPage() {
               <div className="inline-block bg-primary/10 text-primary font-bold py-1 px-4 rounded-full animate-pulse w-fit">
                 Analysis Dashboard
               </div>
-              <CardTitle className="text-4xl md:text-6xl font-bold tracking-tighter text-white">
+              <CardTitle className="text-4xl md:text-6xl font-bold tracking-tighter text-white ">
                 @{username ?? "Unknown"}
               </CardTitle>
+              <div className="h-4"></div>
               {isLoading && (
                 <CardDescription className="text-xl text-gray-400">
                   We&apos;re gathering insights and analyzing the Instagram
                   profile data...
+                </CardDescription>
+              )}
+              {!isLoading && (
+                <CardDescription className="text-xl text-gray-400">
+                  {posts.length} latest post(s) loaded...
                 </CardDescription>
               )}
               {error && (
@@ -185,7 +200,9 @@ export default function AnalysisPage() {
                           value={type}
                           className="text-white hover:bg-white/10"
                         >
-                          {type.charAt(0).toUpperCase() + type.slice(1)}
+                          {type.startsWith("Graph")
+                            ? type.slice(5).trim()
+                            : type.charAt(0).toUpperCase() + type.slice(1)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -199,9 +216,30 @@ export default function AnalysisPage() {
                   <Download className="mr-2 h-4 w-4" />
                   Download Excel
                 </Button>
+                <Button
+                  onClick={() => setIsTableVisible(!isTableVisible)}
+                  variant="outline"
+                  className="border-white/20 text-white bg-black hover:bg-white/10 hover:text-white"
+                >
+                  {isTableVisible ? (
+                    <>
+                      <EyeOff className="mr-2 h-4 w-4" />
+                      Hide Table
+                    </>
+                  ) : (
+                    <>
+                      <Eye className="mr-2 h-4 w-4" />
+                      Show Table
+                    </>
+                  )}
+                </Button>
               </div>
 
-              <div className="rounded-lg border border-white/10 overflow-hidden">
+              <div
+                className={`rounded-lg border border-white/10 overflow-hidden transition-all duration-300 ${
+                  isTableVisible ? "max-h-screen" : "max-h-0 overflow-hidden"
+                }`}
+              >
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader className="bg-white/5 text-white">
@@ -233,7 +271,7 @@ export default function AnalysisPage() {
                           <TableCell colSpan={9} className="text-center py-8">
                             <div className="flex items-center justify-center">
                               <Loader2 className="h-6 w-6 animate-spin text-primary mr-2" />
-                              Loading data...
+                              Loading data, can take a couple of minutes...
                             </div>
                           </TableCell>
                         </TableRow>
@@ -256,7 +294,9 @@ export default function AnalysisPage() {
                               {post.post_id}
                             </TableCell>
                             <TableCell className="capitalize">
-                              {post.type}
+                              {post.type.startsWith("Graph")
+                                ? post.type.slice(5).trim()
+                                : post.type}
                             </TableCell>
                             <TableCell className="text-right">
                               {post.likes_count.toLocaleString()}
