@@ -34,27 +34,50 @@ export async function POST(request) {
     const obj = await response.json();
     const userIdJson = obj.data.user.id;
 
-    // Fetch posts
-    const urlQuery = `${base}/graphql/query/`;
-    const variables = {
-      id: userIdJson,
-      first: 50,
-    };
+    // Initialize variables for pagination
+    let hasNextPage = true;
+    let endCursor = null;
+    let allPosts = [];
+    const POST_LIMIT = 200;
+    const POSTS_PER_REQUEST = 50;
 
-    const postResponse = await fetch(
-      `${urlQuery}?${new URLSearchParams({
-        query_hash: "bd0d6d184eefd4d0ce7036c11ae58ed9",
-        variables: JSON.stringify(variables),
-      })}`
-    );
+    // Fetch posts with pagination
+    while (hasNextPage && allPosts.length < POST_LIMIT) {
+      const variables = {
+        id: userIdJson,
+        first: POSTS_PER_REQUEST,
+        after: endCursor,
+      };
 
-    if (!postResponse.ok) {
-      throw new Error(`Instagram GraphQL API error: ${postResponse.status}`);
-    }
+      const urlQuery = `${base}/graphql/query/`;
+      const postResponse = await fetch(
+        `${urlQuery}?${new URLSearchParams({
+          query_hash: "bd0d6d184eefd4d0ce7036c11ae58ed9",
+          variables: JSON.stringify(variables),
+        })}`,
+        {
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+            Accept: "*/*",
+            "Accept-Language": "en-US,en;q=0.5",
+            "Accept-Encoding": "gzip, deflate, br",
+            Connection: "keep-alive",
+          },
+        }
+      );
 
-    const postData = await postResponse.json();
-    const profileData =
-      postData.data.user.edge_owner_to_timeline_media.edges.map(({ node }) => ({
+      if (!postResponse.ok) {
+        throw new Error(`Instagram GraphQL API error: ${postResponse.status}`);
+      }
+
+      const postData = await postResponse.json();
+      const pageInfo =
+        postData.data.user.edge_owner_to_timeline_media.page_info;
+      const edges = postData.data.user.edge_owner_to_timeline_media.edges;
+
+      // Transform and add posts to our collection
+      const transformedPosts = edges.map(({ node }) => ({
         post_id: node.id,
         type: node.__typename,
         likes_count: node.edge_media_preview_like.count,
@@ -72,7 +95,19 @@ export async function POST(request) {
           node.__typename === "GraphVideo" ? node.video_view_count || 0 : 0,
       }));
 
-    return NextResponse.json(profileData);
+      allPosts = [...allPosts, ...transformedPosts];
+
+      // Update pagination variables
+      hasNextPage = pageInfo.has_next_page;
+      endCursor = pageInfo.end_cursor;
+
+      // Add a small delay between requests to avoid rate limiting
+      if (hasNextPage && allPosts.length < POST_LIMIT) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+    }
+
+    return NextResponse.json(allPosts);
   } catch (error) {
     console.error("Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
