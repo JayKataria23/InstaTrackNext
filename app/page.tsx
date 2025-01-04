@@ -8,6 +8,7 @@ import Image from "next/image";
 import { TeamMember, Feature, TypingConfig } from "@/types";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import { useRouter } from "next/navigation";
 
 const TYPING_CONFIG: TypingConfig = {
   speed: 150,
@@ -41,7 +42,7 @@ const TEAM_MEMBERS: TeamMember[] = [
   },
   {
     name: "Sisha",
-    role: "Frontend Developer",
+    role: "Data Analytics",
     image: "/placeholder.svg?height=128&width=128",
     github: "https://github.com/sisha",
     linkedin: "https://linkedin.com/in/sisha",
@@ -53,11 +54,15 @@ export default function Page(): JSX.Element {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [wordIndex, setWordIndex] = useState(0);
+  const [username, setUsername] = useState(""); // Added username state
+
+  const router = useRouter();
 
   const handleAnalyze = async (): Promise<void> => {
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 2000));
     setIsLoading(false);
+    router.push(`/analysis?username=${encodeURIComponent(username)}`); // Updated handleAnalyze function
   };
 
   useEffect(() => {
@@ -89,7 +94,6 @@ export default function Page(): JSX.Element {
     updateText();
     return () => clearTimeout(timeout);
   }, [displayText, isDeleting, wordIndex]);
-
 
   return (
     <main className="flex-1">
@@ -126,6 +130,8 @@ export default function Page(): JSX.Element {
                 <div className="w-full max-w-md space-y-4">
                   <Input
                     placeholder="@username"
+                    onChange={(e) => setUsername(e.target.value)}
+                    value={username}
                     className="h-12 bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:bg-white/20"
                   />
                   <Button
