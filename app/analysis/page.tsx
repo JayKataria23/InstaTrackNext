@@ -66,6 +66,7 @@ export default function AnalysisPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isTableVisible, setIsTableVisible] = useState(true);
+  const [profileData, setProfileData] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -89,6 +90,23 @@ export default function AnalysisPage() {
 
         const data = await response.json();
         setPosts(data);
+
+        const profileResponse = await fetch("/api/profile", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId: username }),
+        });
+
+        if (!profileResponse.ok) {
+          throw new Error(
+            `Profile API error! status: ${profileResponse.status}`
+          );
+        }
+
+        const profileData = await profileResponse.json();
+        setProfileData(profileData);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to fetch data");
       } finally {
