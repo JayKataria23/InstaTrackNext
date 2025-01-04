@@ -15,16 +15,19 @@ interface Post {
   description: string;
   date_time: number;
   media_url: string;
+  top_comments: string[];
+  views_count: number;
 }
 
 export default function AnalysisPage() {
   const searchParams = useSearchParams();
   const username = searchParams ? searchParams.get("username") : null;
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
 
   const [posts, setPosts] = useState<Post[]>([]);
 
-  const handleClick = async (username: string) => {
+  const fetchData = async (username: string) => {
     const response = await fetch("/api/scrape", {
       method: "POST",
       headers: {
@@ -38,9 +41,11 @@ export default function AnalysisPage() {
   };
 
   useEffect(() => {
+    setIsLoading(true);
     if (username) {
-      handleClick(username as string);
+      fetchData(username as string);
     }
+    setIsLoading(false);
   }, [username]);
 
   return (
@@ -65,35 +70,13 @@ export default function AnalysisPage() {
               Analyzing Profile:{" "}
               <span className="text-primary">@{username || "Unknown"}</span>
             </h1>
-            <p className="text-xl text-gray-400 max-w-2xl">
-              We&apos;re gathering insights and analyzing the Instagram profile
-              data. This process helps us provide you with comprehensive
-              analytics and actionable insights.
-            </p>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-3">
-            <div className="bg-white/5 backdrop-blur-sm p-6 rounded-lg">
-              <h3 className="text-xl font-bold mb-2">Profile Overview</h3>
-              <p className="text-gray-400">
-                Comprehensive analysis of profile metrics and performance
-                indicators.
+            {isLoading && (
+              <p className="text-xl text-gray-400 max-w-2xl">
+                We&apos;re gathering insights and analyzing the Instagram
+                profile data. This process helps us provide you with
+                comprehensive analytics and actionable insights.
               </p>
-            </div>
-            <div className="bg-white/5 backdrop-blur-sm p-6 rounded-lg">
-              <h3 className="text-xl font-bold mb-2">Engagement Analysis</h3>
-              <p className="text-gray-400">
-                Deep dive into engagement rates and audience interaction
-                patterns.
-              </p>
-            </div>
-            <div className="bg-white/5 backdrop-blur-sm p-6 rounded-lg">
-              <h3 className="text-xl font-bold mb-2">Growth Insights</h3>
-              <p className="text-gray-400">
-                Detailed examination of profile growth and development
-                opportunities.
-              </p>
-            </div>
+            )}
           </div>
 
           <div className="overflow-x-auto">
@@ -106,6 +89,8 @@ export default function AnalysisPage() {
                   <th className="py-2">Comments Count</th>
                   <th className="py-2">Description</th>
                   <th className="py-2">Date Time</th>
+                  <th className="py-2">Top Comments</th>
+                  <th className="py-2">Views Count</th>
                   <th className="py-2">Media URL</th>
                 </tr>
               </thead>
@@ -120,6 +105,8 @@ export default function AnalysisPage() {
                     <td className="py-2">
                       {new Date(post.date_time * 1000).toLocaleString()}
                     </td>
+                    <td className="py-2">{post.top_comments.join(", ")}</td>
+                    <td className="py-2">{post.views_count}</td>
                     <td className="py-2">
                       <a
                         href={post.media_url}
