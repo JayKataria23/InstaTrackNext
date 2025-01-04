@@ -5,11 +5,29 @@ import AnimatedBackground from "@/components/animated-background";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function AnalysisPage() {
   const searchParams = useSearchParams();
-  const username = searchParams.get("username");
+  const username = searchParams ? searchParams.get("username") : null;
   const router = useRouter();
+
+  const handleClick = async (username: string) => {
+    const a = await fetch("/api/scrape", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username }),
+    });
+    console.log(await a.json());
+  };
+
+  
+
+  useEffect(() => {
+    handleClick(username as string);
+  }, [username]);
 
   return (
     <div className="min-h-screen bg-black text-white relative">
