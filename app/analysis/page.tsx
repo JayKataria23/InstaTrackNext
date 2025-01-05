@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import * as XLSX from "xlsx";
 import {
   ArrowLeft,
@@ -193,266 +193,273 @@ export default function AnalysisPage() {
   };
 
   return (
-    <div className="min-h-screen text-white relative ">
-      <AnimatedBackground />
-      <div className="container mx-auto px-4 py-8 ">
-        <Button
-          variant="ghost"
-          className="text-white hover:text-primary mb-8"
-          onClick={() => router.push("/")}
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Home
-        </Button>
+    <Suspense fallback={<div>Loading...</div>}>
+      <div className="min-h-screen text-white relative ">
+        <AnimatedBackground />
+        <div className="container mx-auto px-4 py-8 ">
+          <Button
+            variant="ghost"
+            className="text-white hover:text-primary mb-8"
+            onClick={() => router.push("/")}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Home
+          </Button>
 
-        <div className="relative z-10 space-y-8 ">
-          <Card className="bg-black/50 border-white/10 ">
-            <CardHeader>
-              <div className="inline-block bg-primary/10 text-primary font-bold py-1 px-4 rounded-full animate-pulse w-fit">
-                Analysis Dashboard
-              </div>
-              <CardTitle className="text-4xl md:text-6xl font-bold tracking-tighter text-white ">
-                {profileData && (
-                  <Image
-                    src={profileData.profile_pic_url}
-                    alt={`${username}'s profile`}
-                    className="w-16 h-16 rounded-full mr-4 inline-block align-middle border-2 border-primary"
-                    width={60}
-                    height={60}
-                  />
-                )}
-                @{username ?? "Unknown"}
-                {profileData && (
-                  <>
-                    {profileData.is_verified && (
-                      <span
-                        className="text-blue-500 ml-2"
-                        title="Verified Account"
-                      >
-                        <BadgeCheck className="inline w-16 h-16" />
-                      </span>
-                    )}
-                  </>
-                )}
-              </CardTitle>
-              <div className="h-4"></div>
-              {isLoading && (
-                <CardDescription className="text-xl text-gray-400">
-                  We&apos;re gathering insights and analyzing the Instagram
-                  profile data...
-                </CardDescription>
-              )}
-              {!isLoading && profileData && (
-                <>
-                  <CardDescription className="text-xl text-gray-400">
-                    {posts.length} post(s) loaded...
-                  </CardDescription>
-                  <div className="flex items-center mt-4">
-                    <div>
-                      <h2 className="text-lg font-bold text-white">
-                        {profileData.biography}
-                      </h2>
-                      <p className="text-gray-400">
-                        Followers: {profileData.followers_count} | Following:{" "}
-                        {profileData.following_count} | Posts:{" "}
-                        {profileData.posts_count}
-                      </p>
-                    </div>
-                  </div>
-                </>
-              )}
-              {error && (
-                <CardDescription className="text-xl text-red-400">
-                  Error: {error}
-                </CardDescription>
-              )}
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-4 mb-6">
-                <div className="flex items-center gap-2">
-                  <Filter className="h-4 w-4 text-primary" />
-                  <Select value={selectedType} onValueChange={setSelectedType}>
-                    <SelectTrigger className="w-[180px] bg-white/5 border-white/10 text-white">
-                      <SelectValue placeholder="Select post type" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-black/90 border-white/10">
-                      {uniqueTypes.map((type) => (
-                        <SelectItem
-                          key={type}
-                          value={type}
-                          className="text-white hover:bg-white/10"
-                        >
-                          {type.startsWith("Graph")
-                            ? type.slice(5).trim()
-                            : type.charAt(0).toUpperCase() + type.slice(1)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+          <div className="relative z-10 space-y-8 ">
+            <Card className="bg-black/50 border-white/10 ">
+              <CardHeader>
+                <div className="inline-block bg-primary/10 text-primary font-bold py-1 px-4 rounded-full animate-pulse w-fit">
+                  Analysis Dashboard
                 </div>
-                <Button
-                  onClick={handleDownloadExcel}
-                  className="bg-primary hover:bg-primary/90"
-                  disabled={isLoading || !filteredPosts.length}
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  Download Excel
-                </Button>
-                <Button
-                  onClick={() => setIsTableVisible(!isTableVisible)}
-                  variant="outline"
-                  className="border-white/20 text-white bg-black hover:bg-white/10 hover:text-white"
-                >
-                  {isTableVisible ? (
+                <CardTitle className="text-4xl md:text-6xl font-bold tracking-tighter text-white ">
+                  {profileData && (
+                    <Image
+                      src={profileData.profile_pic_url}
+                      alt={`${username}'s profile`}
+                      className="w-16 h-16 rounded-full mr-4 inline-block align-middle border-2 border-primary"
+                      width={60}
+                      height={60}
+                    />
+                  )}
+                  @{username ?? "Unknown"}
+                  {profileData && (
                     <>
-                      <EyeOff className="mr-2 h-4 w-4" />
-                      Hide Table
-                    </>
-                  ) : (
-                    <>
-                      <Eye className="mr-2 h-4 w-4" />
-                      Show Table
+                      {profileData.is_verified && (
+                        <span
+                          className="text-blue-500 ml-2"
+                          title="Verified Account"
+                        >
+                          <BadgeCheck className="inline w-16 h-16" />
+                        </span>
+                      )}
                     </>
                   )}
-                </Button>
-              </div>
+                </CardTitle>
+                <div className="h-4"></div>
+                {isLoading && (
+                  <CardDescription className="text-xl text-gray-400">
+                    We&apos;re gathering insights and analyzing the Instagram
+                    profile data...
+                  </CardDescription>
+                )}
+                {!isLoading && profileData && (
+                  <>
+                    <CardDescription className="text-xl text-gray-400">
+                      {posts.length} post(s) loaded...
+                    </CardDescription>
+                    <div className="flex items-center mt-4">
+                      <div>
+                        <h2 className="text-lg font-bold text-white">
+                          {profileData.biography}
+                        </h2>
+                        <p className="text-gray-400">
+                          Followers: {profileData.followers_count} | Following:{" "}
+                          {profileData.following_count} | Posts:{" "}
+                          {profileData.posts_count}
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                )}
+                {error && (
+                  <CardDescription className="text-xl text-red-400">
+                    Error: {error}
+                  </CardDescription>
+                )}
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-4 mb-6">
+                  <div className="flex items-center gap-2">
+                    <Filter className="h-4 w-4 text-primary" />
+                    <Select
+                      value={selectedType}
+                      onValueChange={setSelectedType}
+                    >
+                      <SelectTrigger className="w-[180px] bg-white/5 border-white/10 text-white">
+                        <SelectValue placeholder="Select post type" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-black/90 border-white/10">
+                        {uniqueTypes.map((type) => (
+                          <SelectItem
+                            key={type}
+                            value={type}
+                            className="text-white hover:bg-white/10"
+                          >
+                            {type.startsWith("Graph")
+                              ? type.slice(5).trim()
+                              : type.charAt(0).toUpperCase() + type.slice(1)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button
+                    onClick={handleDownloadExcel}
+                    className="bg-primary hover:bg-primary/90"
+                    disabled={isLoading || !filteredPosts.length}
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Download Excel
+                  </Button>
+                  <Button
+                    onClick={() => setIsTableVisible(!isTableVisible)}
+                    variant="outline"
+                    className="border-white/20 text-white bg-black hover:bg-white/10 hover:text-white"
+                  >
+                    {isTableVisible ? (
+                      <>
+                        <EyeOff className="mr-2 h-4 w-4" />
+                        Hide Table
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="mr-2 h-4 w-4" />
+                        Show Table
+                      </>
+                    )}
+                  </Button>
+                </div>
 
-              <div
-                className={`rounded-lg border border-white/10 overflow-hidden transition-all duration-300 ${
-                  isTableVisible ? "max-h-screen" : "max-h-0 overflow-hidden"
-                }`}
-              >
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader className="bg-white/5 text-white">
-                      <TableRow>
-                        <TableHead className="text-white">Post ID</TableHead>
-                        <TableHead className="text-white">Type</TableHead>
-                        <TableHead className="text-white text-right">
-                          Likes
-                        </TableHead>
-                        <TableHead className="text-white text-right">
-                          Comments
-                        </TableHead>
-                        <TableHead className="text-white">
-                          Description
-                        </TableHead>
-                        <TableHead className="text-white">Date</TableHead>
-                        <TableHead className="text-white">
-                          Top Comments
-                        </TableHead>
-                        <TableHead className="text-white text-right">
-                          Views
-                        </TableHead>
-                        <TableHead className="text-white">Media</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody className="text-white">
-                      {isLoading ? (
+                <div
+                  className={`rounded-lg border border-white/10 overflow-hidden transition-all duration-300 ${
+                    isTableVisible ? "max-h-screen" : "max-h-0 overflow-hidden"
+                  }`}
+                >
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader className="bg-white/5 text-white">
                         <TableRow>
-                          <TableCell colSpan={9} className="text-center py-8">
-                            <div className="flex items-center justify-center">
-                              <Loader2 className="h-6 w-6 animate-spin text-primary mr-2" />
-                              Loading data, can take a couple of minutes...
-                            </div>
-                          </TableCell>
+                          <TableHead className="text-white">Post ID</TableHead>
+                          <TableHead className="text-white">Type</TableHead>
+                          <TableHead className="text-white text-right">
+                            Likes
+                          </TableHead>
+                          <TableHead className="text-white text-right">
+                            Comments
+                          </TableHead>
+                          <TableHead className="text-white">
+                            Description
+                          </TableHead>
+                          <TableHead className="text-white">Date</TableHead>
+                          <TableHead className="text-white">
+                            Top Comments
+                          </TableHead>
+                          <TableHead className="text-white text-right">
+                            Views
+                          </TableHead>
+                          <TableHead className="text-white">Media</TableHead>
                         </TableRow>
-                      ) : currentPosts.length === 0 ? (
-                        <TableRow>
-                          <TableCell
-                            colSpan={9}
-                            className="text-center py-8 text-gray-400"
-                          >
-                            No posts found
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                        currentPosts.map((post) => (
-                          <TableRow
-                            key={post.post_id}
-                            className="hover:bg-white/5"
-                          >
-                            <TableCell className="font-mono">
-                              {post.post_id}
-                            </TableCell>
-                            <TableCell className="capitalize">
-                              {post.type.startsWith("Graph")
-                                ? post.type.slice(5).trim()
-                                : post.type}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              {post.likes_count.toLocaleString()}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              {post.comments_count.toLocaleString()}
-                            </TableCell>
-                            <TableCell className="max-w-xs truncate">
-                              {post.description}
-                            </TableCell>
-                            <TableCell>{formatDate(post.date_time)}</TableCell>
-                            <TableCell className="max-w-xs truncate">
-                              {post.top_comments.join(", ")}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              {post.views_count > 0
-                                ? post.views_count.toLocaleString()
-                                : "N/A"}
-                            </TableCell>
-                            <TableCell>
-                              <HoverCard>
-                                <HoverCardTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="text-primary hover:text-primary/90"
-                                  >
-                                    <ImageIcon className="h-4 w-4" />
-                                  </Button>
-                                </HoverCardTrigger>
-                                <HoverCardContent
-                                  className="w-auto p-0 bg-black/90 border-white/10"
-                                  side="left"
-                                >
-                                  <MediaPreview
-                                    url={post.media_url}
-                                    type={post.type}
-                                  />
-                                </HoverCardContent>
-                              </HoverCard>
+                      </TableHeader>
+                      <TableBody className="text-white">
+                        {isLoading ? (
+                          <TableRow>
+                            <TableCell colSpan={9} className="text-center py-8">
+                              <div className="flex items-center justify-center">
+                                <Loader2 className="h-6 w-6 animate-spin text-primary mr-2" />
+                                Loading data, can take a couple of minutes...
+                              </div>
                             </TableCell>
                           </TableRow>
-                        ))
-                      )}
-                    </TableBody>
-                  </Table>
+                        ) : currentPosts.length === 0 ? (
+                          <TableRow>
+                            <TableCell
+                              colSpan={9}
+                              className="text-center py-8 text-gray-400"
+                            >
+                              No posts found
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          currentPosts.map((post) => (
+                            <TableRow
+                              key={post.post_id}
+                              className="hover:bg-white/5"
+                            >
+                              <TableCell className="font-mono">
+                                {post.post_id}
+                              </TableCell>
+                              <TableCell className="capitalize">
+                                {post.type.startsWith("Graph")
+                                  ? post.type.slice(5).trim()
+                                  : post.type}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                {post.likes_count.toLocaleString()}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                {post.comments_count.toLocaleString()}
+                              </TableCell>
+                              <TableCell className="max-w-xs truncate">
+                                {post.description}
+                              </TableCell>
+                              <TableCell>
+                                {formatDate(post.date_time)}
+                              </TableCell>
+                              <TableCell className="max-w-xs truncate">
+                                {post.top_comments.join(", ")}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                {post.views_count > 0
+                                  ? post.views_count.toLocaleString()
+                                  : "N/A"}
+                              </TableCell>
+                              <TableCell>
+                                <HoverCard>
+                                  <HoverCardTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="text-primary hover:text-primary/90"
+                                    >
+                                      <ImageIcon className="h-4 w-4" />
+                                    </Button>
+                                  </HoverCardTrigger>
+                                  <HoverCardContent
+                                    className="w-auto p-0 bg-black/90 border-white/10"
+                                    side="left"
+                                  >
+                                    <MediaPreview
+                                      url={post.media_url}
+                                      type={post.type}
+                                    />
+                                  </HoverCardContent>
+                                </HoverCard>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  <div className={`flex justify-between mt-4 `}>
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="bg-primary text-white px-4 py-2 rounded"
+                    >
+                      Previous
+                    </button>
+                    <span className="text-white">
+                      Page {currentPage} of {totalPages} | Showing{" "}
+                      {indexOfFirstPost + 1} -{" "}
+                      {Math.min(indexOfLastPost, filteredPosts.length)} of{" "}
+                      {filteredPosts.length} posts
+                    </span>
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className="bg-primary text-white px-4 py-2 rounded"
+                    >
+                      Next
+                    </button>
+                  </div>
                 </div>
-                <div className={`flex justify-between mt-4 `}>
-                  <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="bg-primary text-white px-4 py-2 rounded"
-                  >
-                    Previous
-                  </button>
-                  <span className="text-white">
-                    Page {currentPage} of {totalPages} | Showing{" "}
-                    {indexOfFirstPost + 1} -{" "}
-                    {Math.min(indexOfLastPost, filteredPosts.length)} of{" "}
-                    {filteredPosts.length} posts
-                  </span>
-                  <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="bg-primary text-white px-4 py-2 rounded"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
-    </div>
+    </Suspense>
   );
 }
