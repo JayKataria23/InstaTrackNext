@@ -68,7 +68,7 @@ interface Post {
 }
 
 export default function AnalysisPage() {
-  const router = useRouter()
+  const router = useRouter();
   const [username, setUsername] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedType, setSelectedType] = useState("all");
@@ -104,8 +104,8 @@ export default function AnalysisPage() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        console.log(response.text);
         const data = await response.json();
+        console.log(data);
         setPosts(data);
 
         const profileResponse = await fetch("/api/profile", {
