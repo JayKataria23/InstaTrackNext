@@ -1,6 +1,5 @@
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import {
@@ -44,6 +43,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface ProfileData {
   profile_pic_url: string;
@@ -68,10 +68,8 @@ interface Post {
 }
 
 export default function AnalysisPage() {
-  const searchParams = useSearchParams();
-  const username = searchParams?.get("username") ?? null;
-  const router = useRouter();
-
+  const router = useRouter()
+  const [username, setUsername] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedType, setSelectedType] = useState("all");
   const [posts, setPosts] = useState<Post[]>([]);
@@ -82,8 +80,13 @@ export default function AnalysisPage() {
   const postsPerPage = 10; // Number of posts to display per page
 
   useEffect(() => {
+    // Get query parameters from the URL
+    const params = new URLSearchParams(window.location.search);
+    const usernameFromParams = params.get("username");
+    setUsername(usernameFromParams);
+
     const fetchData = async () => {
-      if (!username) return;
+      if (!usernameFromParams) return;
 
       setIsLoading(true);
       setError(null);
@@ -94,7 +97,7 @@ export default function AnalysisPage() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ userId: username }),
+          body: JSON.stringify({ userId: usernameFromParams }),
         });
 
         if (!response.ok) {
@@ -110,7 +113,7 @@ export default function AnalysisPage() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ userId: username }),
+          body: JSON.stringify({ userId: usernameFromParams }),
         });
 
         if (!profileResponse.ok) {
