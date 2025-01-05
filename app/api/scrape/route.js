@@ -4,6 +4,7 @@ import fetch from "node-fetch";
 export async function POST(request) {
   try {
     const { userId } = await request.json();
+    console.log(userId);
 
     if (!userId) {
       return NextResponse.json(
