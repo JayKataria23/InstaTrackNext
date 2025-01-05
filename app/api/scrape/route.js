@@ -30,6 +30,11 @@ export async function POST(request) {
     if (!response.ok) {
       throw new Error(`Instagram API error: ${response.status}`);
     }
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Response text:", errorText);
+      throw new Error(`Instagram API error: ${response.status} - ${errorText}`);
+    }
 
     const obj = await response.json();
     const userIdJson = obj.data.user.id;
