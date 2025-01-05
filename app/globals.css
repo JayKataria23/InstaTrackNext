@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -25,7 +25,7 @@
     --ring: 0 0% 3.9%;
     --radius: 0.75rem;
   }
- 
+
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -84,3 +84,16 @@
   animation: float-random linear infinite;
 }
 
+/* Hide scrollbars for all elements */
+* {
+  scrollbar-width: none; /* For Firefox */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* For Chrome, Safari, and Opera */
+}
+
+/* Optional: Hide scrollbars for specific elements */
+.no-scrollbar {
+  overflow: hidden; /* Prevent scrolling */
+}

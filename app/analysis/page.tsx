@@ -78,6 +78,8 @@ export default function AnalysisPage() {
   const [error, setError] = useState<string | null>(null);
   const [isTableVisible, setIsTableVisible] = useState(true);
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 10; // Number of posts to display per page
 
   useEffect(() => {
     const fetchData = async () => {
@@ -175,21 +177,36 @@ export default function AnalysisPage() {
     );
   };
 
+  // Calculate the index of the last post on the current page
+  const indexOfLastPost = currentPage * postsPerPage;
+  // Calculate the index of the first post on the current page
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  // Get the current posts
+  const currentPosts = filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
+
+  // Calculate total pages
+  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+
+  // Function to handle page change
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
-    <div className="min-h-screen text-white relative">
+    <div className="min-h-screen text-white relative ">
       <AnimatedBackground />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 ">
         <Button
           variant="ghost"
           className="text-white hover:text-primary mb-8"
-          onClick={() => router.back()}
+          onClick={() => router.push("/")}
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Home
         </Button>
 
-        <div className="relative z-10 space-y-8">
-          <Card className="bg-black/50 border-white/10">
+        <div className="relative z-10 space-y-8 ">
+          <Card className="bg-black/50 border-white/10 ">
             <CardHeader>
               <div className="inline-block bg-primary/10 text-primary font-bold py-1 px-4 rounded-full animate-pulse w-fit">
                 Analysis Dashboard
@@ -340,7 +357,7 @@ export default function AnalysisPage() {
                             </div>
                           </TableCell>
                         </TableRow>
-                      ) : filteredPosts.length === 0 ? (
+                      ) : currentPosts.length === 0 ? (
                         <TableRow>
                           <TableCell
                             colSpan={9}
@@ -350,7 +367,7 @@ export default function AnalysisPage() {
                           </TableCell>
                         </TableRow>
                       ) : (
-                        filteredPosts.map((post) => (
+                        currentPosts.map((post) => (
                           <TableRow
                             key={post.post_id}
                             className="hover:bg-white/5"
@@ -408,6 +425,28 @@ export default function AnalysisPage() {
                       )}
                     </TableBody>
                   </Table>
+                </div>
+                <div className={`flex justify-between mt-4 `}>
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="bg-primary text-white px-4 py-2 rounded"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-white">
+                    Page {currentPage} of {totalPages} | Showing{" "}
+                    {indexOfFirstPost + 1} -{" "}
+                    {Math.min(indexOfLastPost, filteredPosts.length)} of{" "}
+                    {filteredPosts.length} posts
+                  </span>
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="bg-primary text-white px-4 py-2 rounded"
+                  >
+                    Next
+                  </button>
                 </div>
               </div>
             </CardContent>

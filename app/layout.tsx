@@ -21,7 +21,7 @@ export default function RootLayout({ children }: RootLayoutProps): JSX.Element {
       <body className={inter.className}>
         <AnimatedBackground />
         <ScrollToTop />
-        <div className="flex min-h-screen flex-col relative">{children}</div>
+        <div className="flex min-h-screen flex-col relative ">{children}</div>
       </body>
     </html>
   );
