@@ -13,7 +13,8 @@ export async function POST(request) {
       );
     }
 
-    const url = "https://i.instagram.com/api/v1/users/web_profile_info";
+    const url =
+      "https://www.instagram.com/api/v1/users/web_profile_info/";
     const base = "https://www.instagram.com";
 
     // Get user ID first
@@ -31,7 +32,7 @@ export async function POST(request) {
     if (!response.ok) {
       throw new Error(`Instagram API error: ${response.status}`);
     }
-
+    console.log(response.text)
     const obj = await response.json();
     const userIdJson = obj.data.user.id;
 
