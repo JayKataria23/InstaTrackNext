@@ -17,6 +17,11 @@ const nextConfig = {
         hostname: "instagram.*.fna.fbcdn.net",
         pathname: "**",
       },
+      {
+        protocol: "https",
+        hostname: "media.licdn.com",
+        pathname: "**",
+      },
     ],
   },
 };

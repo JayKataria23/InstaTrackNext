@@ -5,7 +5,7 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 w-full border-b bg-white px-[5%]">
       <div className="container flex h-20 items-center justify-between max-w-7xl mx-auto">
         <div className="flex items-center gap-3">
-          <span className="text-3xl font-extrabold">InstaTrack</span>
+          <span className="text-3xl font-extrabold tracking-tighter">InstaTrack</span>
         </div>
         <nav className="hidden md:flex items-center justify-center space-x-8 flex-1 max-w-2xl mx-auto">
           <Link

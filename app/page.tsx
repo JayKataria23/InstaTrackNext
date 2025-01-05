@@ -9,6 +9,7 @@ import { TeamMember, Feature, TypingConfig } from "@/types";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { useRouter } from "next/navigation";
+import ss from ".//ss.png";
 
 const TYPING_CONFIG: TypingConfig = {
   speed: 150,
@@ -36,16 +37,18 @@ const TEAM_MEMBERS: TeamMember[] = [
   {
     name: "Jay Kataria",
     role: "Full Stack Developer",
-    image: "/placeholder.svg?height=128&width=128",
-    github: "https://github.com/jaykataria1111",
-    linkedin: "https://linkedin.com/in/jay-kataria-8738a4250",
+    image:
+      "https://media.licdn.com/dms/image/v2/D4D03AQHWvMcBiAqVag/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1680287478048?e=1741824000&v=beta&t=rUOFFtmxCpWZwnN7QQGq2FoVlBSKQ5zbc84WWDSTzuQ",
+    github: "https://github.com/JayKataria23",
+    linkedin: "https://www.linkedin.com/in/jay-kataria-209929183/",
   },
   {
-    name: "Sisha",
+    name: "Isha Singla",
     role: "Data Analytics",
-    image: "/placeholder.svg?height=128&width=128",
-    github: "https://github.com/sisha",
-    linkedin: "https://linkedin.com/in/sisha",
+    image:
+      "https://media.licdn.com/dms/image/v2/D5603AQEMA668YQ0Jmg/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1677759147526?e=1741824000&v=beta&t=viYRNkQCaCNtZtcv2SUwqnDzJwr0-HtVnCNnFQ6_P8s",
+    github: "https://github.com/courseraisha",
+    linkedin: "https://www.linkedin.com/in/isha-singla16/",
   },
 ];
 
@@ -98,10 +101,13 @@ export default function Page(): JSX.Element {
   return (
     <main className="flex-1">
       <Navbar />
-      <section className="relative min-h-screen flex items-center py-20 md:py-28 lg:py-32">
+      <section
+        id="get-started"
+        className="relative min-h-screen flex items-center py-20 md:py-28 lg:py-32"
+      >
         <div className="absolute inset-0 bg-gradient-to-b from-purple-500/10 to-transparent pointer-events-none" />
         <div className="container relative px-8 md:px-16 mx-auto">
-          <div className="grid gap-8 lg:grid-cols-[1fr_400px] lg:gap-16 xl:grid-cols-[1fr_600px]">
+          <div className="grid gap-8 lg:grid-cols-[1fr_600px] lg:gap-16 xl:grid-cols-[1fr_800px]">
             <div className="flex flex-col justify-center space-y-8 w-full">
               <div className="flex flex-col space-y-8 w-full max-w-[600px] mx-auto lg:mx-0">
                 <div className="inline-block self-start bg-primary/10 text-primary font-bold py-2 px-6 rounded-full animate-pulse">
@@ -150,6 +156,15 @@ export default function Page(): JSX.Element {
                   </Button>
                 </div>
               </div>
+            </div>
+            <div className="flex justify-center items-center mb-20">
+              <Image
+                src={ss}
+                alt="Description of the image"
+                width={900}
+                height={800}
+                className="object-contain border-8 border-white rounded-lg"
+              />
             </div>
           </div>
         </div>
@@ -272,8 +287,12 @@ export default function Page(): JSX.Element {
             <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
               <Button
                 className="h-12 px-8 bg-primary hover:bg-primary/90 transition-all duration-300 transform hover:scale-105 text-lg font-medium"
-                onClick={handleAnalyze}
                 disabled={isLoading}
+                onClick={() =>
+                  document
+                    .getElementById("get-started")
+                    ?.scrollIntoView({ behavior: "smooth" })
+                }
               >
                 {isLoading ? (
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />

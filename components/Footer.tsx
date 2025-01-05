@@ -22,7 +22,7 @@ const Footer = () => {
           <div className="flex flex-col items-start gap-4">
             <div className="flex items-center gap-3">
               <BarChart3 className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-extrabold">InstaTrack</span>
+              <span className="text-2xl font-extrabold tracking-tighter">InstaTrack</span>
             </div>
             <p className="text-sm">Track Smarter, Engage Better</p>
           </div>
