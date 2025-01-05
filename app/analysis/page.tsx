@@ -11,6 +11,7 @@ import {
   Loader2,
   Eye,
   EyeOff,
+  BadgeCheck,
 } from "lucide-react";
 
 import AnimatedBackground from "@/components/animated-background";
@@ -44,6 +45,16 @@ import {
 } from "@/components/ui/hover-card";
 import Image from "next/image";
 
+interface ProfileData {
+  profile_pic_url: string;
+  followers_count: number;
+  following_count: number;
+  posts_count: number;
+  biography: string;
+  is_private: boolean;
+  is_verified: boolean;
+}
+
 interface Post {
   post_id: string;
   type: string;
@@ -66,7 +77,7 @@ export default function AnalysisPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isTableVisible, setIsTableVisible] = useState(true);
-  const [profileData, setProfileData] = useState(null);
+  const [profileData, setProfileData] = useState<ProfileData | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -89,6 +100,7 @@ export default function AnalysisPage() {
         }
 
         const data = await response.json();
+        console.log(data);
         setPosts(data);
 
         const profileResponse = await fetch("/api/profile", {
@@ -105,7 +117,7 @@ export default function AnalysisPage() {
           );
         }
 
-        const profileData = await profileResponse.json();
+        const profileData: ProfileData = await profileResponse.json();
         setProfileData(profileData);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to fetch data");
@@ -164,7 +176,7 @@ export default function AnalysisPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white relative">
+    <div className="min-h-screen text-white relative">
       <AnimatedBackground />
       <div className="container mx-auto px-4 py-8">
         <Button
@@ -183,7 +195,28 @@ export default function AnalysisPage() {
                 Analysis Dashboard
               </div>
               <CardTitle className="text-4xl md:text-6xl font-bold tracking-tighter text-white ">
+                {profileData && (
+                  <Image
+                    src={profileData.profile_pic_url}
+                    alt={`${username}'s profile`}
+                    className="w-16 h-16 rounded-full mr-4 inline-block align-middle border-2 border-primary"
+                    width={60}
+                    height={60}
+                  />
+                )}
                 @{username ?? "Unknown"}
+                {profileData && (
+                  <>
+                    {profileData.is_verified && (
+                      <span
+                        className="text-blue-500 ml-2"
+                        title="Verified Account"
+                      >
+                        <BadgeCheck className="inline w-16 h-16" />
+                      </span>
+                    )}
+                  </>
+                )}
               </CardTitle>
               <div className="h-4"></div>
               {isLoading && (
@@ -192,10 +225,24 @@ export default function AnalysisPage() {
                   profile data...
                 </CardDescription>
               )}
-              {!isLoading && (
-                <CardDescription className="text-xl text-gray-400">
-                  {posts.length} latest post(s) loaded...
-                </CardDescription>
+              {!isLoading && profileData && (
+                <>
+                  <CardDescription className="text-xl text-gray-400">
+                    {posts.length} post(s) loaded...
+                  </CardDescription>
+                  <div className="flex items-center mt-4">
+                    <div>
+                      <h2 className="text-lg font-bold text-white">
+                        {profileData.biography}
+                      </h2>
+                      <p className="text-gray-400">
+                        Followers: {profileData.followers_count} | Following:{" "}
+                        {profileData.following_count} | Posts:{" "}
+                        {profileData.posts_count}
+                      </p>
+                    </div>
+                  </div>
+                </>
               )}
               {error && (
                 <CardDescription className="text-xl text-red-400">
