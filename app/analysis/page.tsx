@@ -104,8 +104,8 @@ export default function AnalysisPage() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
+        console.log(response.text);
         const data = await response.json();
-        console.log(data);
         setPosts(data);
 
         const profileResponse = await fetch("/api/profile", {
