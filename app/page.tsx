@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { ArrowRight, Loader2, Github, Linkedin } from "lucide-react";
 import Image from "next/image";
@@ -10,6 +9,13 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { useRouter } from "next/navigation";
 import ss from ".//ss.png";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const TYPING_CONFIG: TypingConfig = {
   speed: 150,
@@ -51,13 +57,15 @@ const TEAM_MEMBERS: TeamMember[] = [
     linkedin: "https://www.linkedin.com/in/isha-singla16/",
   },
 ];
-
+// ... existing code ...
 export default function Page(): JSX.Element {
   const [displayText, setDisplayText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [wordIndex, setWordIndex] = useState(0);
-  const [username, setUsername] = useState(""); // Added username state
+  const [usernames, setUsernames] = useState<string[]>([]); // Initialize as empty array
+  const [username, setUsername] = useState("");
+  // ... existing code ...
 
   const router = useRouter();
 
@@ -95,8 +103,32 @@ export default function Page(): JSX.Element {
     };
 
     updateText();
+
     return () => clearTimeout(timeout);
   }, [displayText, isDeleting, wordIndex]);
+
+  useEffect(() => {
+    const fetchUsernames = async () => {
+      try {
+        const response = await fetch("/api/names");
+        const data = await response.json();
+        console.log(data.usernames);
+
+        // Ensure data is an array before setting it
+        if (Array.isArray(data.usernames)) {
+          setUsernames(data.usernames);
+        } else {
+          console.error("Received data is not an array:", data);
+          setUsernames([]); // Set empty array as fallback
+        }
+      } catch (error) {
+        console.error("Error fetching usernames:", error);
+        setUsernames([]); // Set empty array on error
+      }
+    };
+
+    fetchUsernames();
+  }, []);
 
   return (
     <main className="flex-1">
@@ -133,17 +165,28 @@ export default function Page(): JSX.Element {
                     Your go-to Instagram analysis tool
                   </p>
                 </div>
-                <div className="w-full max-w-md space-y-4">
-                  <Input
-                    placeholder="@username"
-                    onChange={(e) => setUsername(e.target.value)}
+                <div className="w-full max-w-md space-y-4 text-white">
+                  <Select
                     value={username}
-                    className="h-12 bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:bg-white/20"
-                  />
+                    onValueChange={(value) => setUsername(value)}
+                    
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a username" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Array.isArray(usernames) &&
+                        usernames.map((username: string) => (
+                          <SelectItem key={username} value={username}>
+                            @{username}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
                   <Button
                     className="w-full h-12 bg-primary hover:bg-primary/90 transition-all duration-300 transform hover:scale-105"
                     onClick={handleAnalyze}
-                    disabled={isLoading}
+                    disabled={isLoading || !username} // Disable if loading or no username selected
                   >
                     {isLoading ? (
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />

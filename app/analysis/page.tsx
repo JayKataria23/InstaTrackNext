@@ -80,49 +80,44 @@ export default function AnalysisPage() {
   const postsPerPage = 10; // Number of posts to display per page
 
   useEffect(() => {
-    // Get query parameters from the URL
-    const params = new URLSearchParams(window.location.search);
-    const usernameFromParams = params.get("username");
-    setUsername(usernameFromParams);
-
     const fetchData = async () => {
-      if (!usernameFromParams) return;
+      const params = new URLSearchParams(window.location.search);
+      const usernameFromParams = params.get("username");
 
+      if (!usernameFromParams) {
+        setIsLoading(false);
+        setError("No username provided");
+        return;
+      }
+
+      setUsername(usernameFromParams);
       setIsLoading(true);
       setError(null);
 
       try {
-        const response = await fetch("/api/scrape", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ userId: usernameFromParams }),
-        });
+        // Fetch both data and profile in parallel
+        const [dataResponse, profileResponse] = await Promise.all([
+          fetch(`/api/data?username=${usernameFromParams}`),
+          fetch(`/api/profile?username=${usernameFromParams}`),
+        ]);
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        // Check for errors
+        if (!dataResponse.ok) {
+          throw new Error(`Data API error! status: ${dataResponse.status}`);
         }
-
-        const data = await response.json();
-        console.log(data);
-        setPosts(data);
-
-        const profileResponse = await fetch("/api/profile", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ userId: usernameFromParams }),
-        });
-
         if (!profileResponse.ok) {
           throw new Error(
             `Profile API error! status: ${profileResponse.status}`
           );
         }
 
-        const profileData: ProfileData = await profileResponse.json();
+        // Parse responses
+        const [postsData, profileData] = await Promise.all([
+          dataResponse.json(),
+          profileResponse.json(),
+        ]);
+
+        setPosts(postsData.posts);
         setProfileData(profileData);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to fetch data");
@@ -132,7 +127,7 @@ export default function AnalysisPage() {
     };
 
     fetchData();
-  }, [username]);
+  }, []);
 
   const filteredPosts =
     selectedType === "all"
@@ -394,7 +389,7 @@ export default function AnalysisPage() {
                             </TableCell>
                             <TableCell>{formatDate(post.date_time)}</TableCell>
                             <TableCell className="max-w-xs truncate">
-                              {post.top_comments.join(", ")}
+                              {post.top_comments}
                             </TableCell>
                             <TableCell className="text-right">
                               {post.views_count > 0
