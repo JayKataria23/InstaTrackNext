@@ -12,7 +12,6 @@ import {
   EyeOff,
   BadgeCheck,
 } from "lucide-react";
-
 import AnimatedBackground from "@/components/animated-background";
 import { Button } from "@/components/ui/button";
 import {
@@ -44,6 +43,21 @@ import {
 } from "@/components/ui/hover-card";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { LineChart, PieChart } from "lucide-react"; // Add these
+import { Input } from "@/components/ui/input"; // Add this
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Bar,
+  Pie,
+  Cell,
+  BarChart as BChart
+} from "recharts";
 
 interface ProfileData {
   profile_pic_url: string;
@@ -78,6 +92,13 @@ export default function AnalysisPage() {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 10; // Number of posts to display per page
+  const [isChartsVisible, setIsChartsVisible] = useState(true);
+  const [query, setQuery] = useState("");
+  const [insights, setInsights] = useState<{ [key: string]: string }>({
+    engagement: "",
+    postTypes: "",
+    timing: "",
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -445,6 +466,212 @@ export default function AnalysisPage() {
                   >
                     Next
                   </button>
+                </div>
+              </div>
+              {/* Data Visualization Section */}
+              <div className="mt-8">
+                <div className="flex justify-between items-center mb-6">
+                  <div className="flex items-center gap-2">
+                    <LineChart className="h-4 w-4 text-primary" />
+                    <h2 className="text-xl font-bold">Data Visualization</h2>
+                  </div>
+                  <Button
+                    onClick={() => setIsChartsVisible(!isChartsVisible)}
+                    variant="outline"
+                    className="border-white/20 text-white bg-black hover:bg-white/10"
+                  >
+                    {isChartsVisible ? (
+                      <>
+                        <EyeOff className="mr-2 h-4 w-4" />
+                        Hide Charts
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="mr-2 h-4 w-4" />
+                        Show Charts
+                      </>
+                    )}
+                  </Button>
+                </div>
+
+                {/* Query Input */}
+                <div className="mb-6">
+                  <Input
+                    placeholder="Ask a question about the data..."
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    className="bg-white/5 border-white/10 text-white"
+                  />
+                </div>
+
+                {/* Charts Section */}
+                <div
+                  className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-all duration-300 ${
+                    isChartsVisible ? "block" : "hidden"
+                  }`}
+                >
+                  {/* Engagement Over Time Chart */}
+                  <Card className="bg-black/50 border-white/10">
+                    <CardHeader>
+                      <div className="flex justify-between items-center">
+                        <CardTitle className="text-lg">
+                          Engagement Over Time
+                        </CardTitle>
+                        <Button
+                          onClick={() => {
+                            // Add your insight generation logic here
+                            setInsights({
+                              ...insights,
+                              engagement: "Analyzing engagement patterns...",
+                            });
+                          }}
+                          size="sm"
+                          className="bg-primary/10 text-primary hover:bg-primary/20"
+                        >
+                          Generate Insights
+                        </Button>
+                      </div>
+                      {insights.engagement && (
+                        <CardDescription className="text-sm mt-2">
+                          {insights.engagement}
+                        </CardDescription>
+                      )}
+                    </CardHeader>
+                    <CardContent className="h-[300px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart
+                          data={posts.map((post) => ({
+                            date: new Date(
+                              post.date_time * 1000
+                            ).toLocaleDateString(),
+                            engagement: post.likes_count + post.comments_count,
+                          }))}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                          <XAxis dataKey="date" stroke="#fff" />
+                          <YAxis stroke="#fff" />
+                          <Tooltip />
+                          <Area
+                            type="monotone"
+                            dataKey="engagement"
+                            stroke="#8B5CF6"
+                            fill="#8B5CF6"
+                            fillOpacity={0.3}
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+
+                  {/* Post Types Distribution */}
+                  <Card className="bg-black/50 border-white/10">
+                    <CardHeader>
+                      <div className="flex justify-between items-center">
+                        <CardTitle className="text-lg">
+                          Content Distribution
+                        </CardTitle>
+                        <Button
+                          onClick={() => {
+                            setInsights({
+                              ...insights,
+                              postTypes: "Analyzing content patterns...",
+                            });
+                          }}
+                          size="sm"
+                          className="bg-primary/10 text-primary hover:bg-primary/20"
+                        >
+                          Generate Insights
+                        </Button>
+                      </div>
+                      {insights.postTypes && (
+                        <CardDescription className="text-sm mt-2">
+                          {insights.postTypes}
+                        </CardDescription>
+                      )}
+                    </CardHeader>
+                    <CardContent className="h-[300px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={Array.from(
+                              posts.reduce((acc, post) => {
+                                const type = post.type.startsWith("Graph")
+                                  ? post.type.slice(5).trim()
+                                  : post.type;
+                                acc.set(type, (acc.get(type) || 0) + 1);
+                                return acc;
+                              }, new Map()),
+                              ([name, value]) => ({ name, value })
+                            )}
+                            dataKey="value"
+                            nameKey="name"
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={80}
+                            fill="#8B5CF6"
+                          >
+                            {posts.map((_, index) => (
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={`hsl(${
+                                  (index * 360) / posts.length
+                                }, 70%, 50%)`}
+                              />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+
+                  {/* Performance Metrics */}
+                  <Card className="bg-black/50 border-white/10">
+                    <CardHeader>
+                      <div className="flex justify-between items-center">
+                        <CardTitle className="text-lg">
+                          Performance Metrics
+                        </CardTitle>
+                        <Button
+                          onClick={() => {
+                            setInsights({
+                              ...insights,
+                              timing: "Analyzing performance metrics...",
+                            });
+                          }}
+                          size="sm"
+                          className="bg-primary/10 text-primary hover:bg-primary/20"
+                        >
+                          Generate Insights
+                        </Button>
+                      </div>
+                      {insights.timing && (
+                        <CardDescription className="text-sm mt-2">
+                          {insights.timing}
+                        </CardDescription>
+                      )}
+                    </CardHeader>
+                    <CardContent className="h-[300px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BChart
+                          data={posts.slice(-10).map((post) => ({
+                            id: post.post_id,
+                            likes: post.likes_count,
+                            comments: post.comments_count,
+                            views: post.views_count,
+                          }))}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                          <XAxis dataKey="id" stroke="#fff" />
+                          <YAxis stroke="#fff" />
+                          <Tooltip />
+                          <Bar dataKey="likes" fill="#8B5CF6" />
+                          <Bar dataKey="comments" fill="#EC4899" />
+                          <Bar dataKey="views" fill="#10B981" />
+                        </BChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
             </CardContent>
