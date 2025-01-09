@@ -48,7 +48,6 @@ import {
 } from "@/components/ui/hover-card";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { LineChart } from "lucide-react"; // Add these
 import { Input } from "@/components/ui/input"; // Add this
 import {
   AreaChart,
@@ -63,9 +62,7 @@ import {
   Cell,
   BarChart as BChart,
   PieChart,
-  Label,
   Legend,
-  LabelList,
 } from "recharts";
 
 interface ProfileData {
@@ -177,9 +174,6 @@ export default function AnalysisPage() {
     XLSX.writeFile(workbook, `${username}-instagram-data.xlsx`);
   };
 
-  const formatDate = (timestamp: number) => {
-    return new Date(timestamp * 1000).toLocaleDateString();
-  };
 
   const MediaPreview = ({ url, type }: { url: string; type: string }) => {
     const [isImageError, setIsImageError] = useState(false);
@@ -623,7 +617,7 @@ export default function AnalysisPage() {
                                 acc.set(type, (acc.get(type) || 0) + 1);
                                 return acc;
                               }, new Map())
-                            ).map(([name], index) => (
+                            ).map((_, index) => (
                               <Cell
                                 key={`cell-${index}`}
                                 fill={
