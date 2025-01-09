@@ -7,10 +7,10 @@ import {
   Download,
   Filter,
   ImageIcon,
-  Loader2,
   Eye,
   EyeOff,
   BadgeCheck,
+  Loader2, Sparkles, Search, Bot, AlertCircle 
 } from "lucide-react";
 import AnimatedBackground from "@/components/animated-background";
 import { Button } from "@/components/ui/button";
@@ -356,50 +356,93 @@ export default function AnalysisPage() {
                 
 
                 {/* Query Input */}
-                <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-400 mb-2">
-                    Ask a question about the data (Realtime AI Generated)
-                    </label>
-                    <div className="flex flex-col md:flex-row md:items-center gap-2">
-                      <Input
-                      placeholder="Ask a question about the data..."
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      className="bg-white/5 border-white/10 text-white flex-grow"
-                      />
-                      <Button
-                      onClick={async () => {
-                        if (!query) return;
-                        setIsLoading(true);
-                        try {
-                        const response = await fetch('/api/chat', {
-                          method: 'POST',
-                          headers: {
-                          'Content-Type': 'application/json',
-                          },
-                          body: JSON.stringify({ message: query }),
-                        });
-                        const data = await response.json();
-                        setAiResponse(data);
-                        } catch (error) {
-                        console.error('Error:', error);
-                        setError('Failed to get AI response');
-                        } finally {
-                        setIsLoading(false);
-                        }
-                      }}
-                      className="mt-2 md:mt-0 bg-primary hover:bg-primary/90"
-                      >
-                      Ask AI
-                      </Button>
-                    </div>
-                    {aiResponse && (
-                    <div className="mt-4 p-4 bg-black/50 border border-white/10 rounded-lg">
-                      <h3 className="text-lg font-bold text-white">AI Response:</h3>
-                      <p className="text-gray-400 whitespace-pre-line">{aiResponse}</p>
-                    </div>
-                    )}
-                </div>
+                <Card className="bg-inherit border-white/10 mb-8 backdrop-blur-sm">
+  <CardHeader className="pb-4">
+    <div className="flex items-center gap-3">
+      <div className="p-2 rounded-lg bg-primary/10">
+        <Sparkles className="h-5 w-5 text-primary" />
+      </div>
+      <div>
+        <CardTitle className="text-xl font-semibold bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
+          AI-Powered Insights
+        </CardTitle>
+        <CardDescription className="text-gray-400">
+          Ask questions about the data and get real-time AI-generated answers
+        </CardDescription>
+      </div>
+    </div>
+  </CardHeader>
+  <CardContent>
+    <div className="space-y-4">
+      <div className="relative">
+        <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+          <Search className="h-5 w-5 text-gray-400" />
+        </div>
+        <Input
+          placeholder="E.g., What's the best time to post?"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="bg-white/5 border-white/10 text-white pl-10 pr-32 h-12 text-lg focus:ring-2 focus:ring-primary/50 transition-all"
+        />
+        <Button
+          onClick={async () => {
+            if (!query) return;
+            setIsLoading(true);
+            try {
+              const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: query }),
+              });
+              const data = await response.json();
+              setAiResponse(data);
+            } catch (error) {
+              console.error('Error:', error);
+              setError('Failed to get AI response');
+            } finally {
+              setIsLoading(false);
+            }
+          }}
+          className="absolute right-2 top-2 bottom-2 bg-primary hover:bg-primary/90 transition-all duration-200 px-6"
+          disabled={isLoading || !query.trim()}
+        >
+          {isLoading ? (
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Thinking...</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              <span>Ask AI</span>
+            </div>
+          )}
+        </Button>
+      </div>
+
+      {error && (
+        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 flex items-center gap-2">
+          <AlertCircle className="h-5 w-5" />
+          <p>{error}</p>
+        </div>
+      )}
+
+      {aiResponse && (
+        <div className="mt-4 p-6 bg-white/5 border border-white/10 rounded-lg space-y-3">
+          <div className="flex items-center gap-2">
+            <Bot className="h-5 w-5 text-primary" />
+            <h3 className="text-lg font-medium text-white">AI Response</h3>
+          </div>
+          <div className="pl-7">
+            <p className="text-gray-300 whitespace-pre-line leading-relaxed">{aiResponse}</p>
+          </div>
+        </div>
+      )}
+    </div>
+  </CardContent>
+</Card>
 
                 {/* Charts Section */}
                 <div
