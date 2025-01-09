@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
+import Markdown from "react-markdown";
 import {
   ArrowLeft,
   Download,
@@ -466,18 +467,38 @@ export default function AnalysisPage() {
                   }`}
                 >
                   {/* Engagement Over Time Chart */}
-                  <Card className="bg-black/50 border-</div>white/10">
+                  <Card className="bg-black/50">
                     <CardHeader>
                       <div className="flex justify-between items-center">
                         <CardTitle className="text-lg">
                           Engagement Over Time
                         </CardTitle>
                         <Button
-                          onClick={() => {
-                            // Add your insight generation logic here
+                          onClick={async () => {
                             setEngagementInsight(
                               "Analyzing engagement over time..."
                             );
+                            setIsLoading(true);
+                            try {
+                              const response = await fetch("/api/chat", {
+                                method: "POST",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                  message: `Analyze the engagement over time for ${username} account and for ${selectedType} posts, give only 3 short insights`,
+                                }),
+                              });
+                              const data = await response.json();
+                              setEngagementInsight(data);
+                            } catch (error) {
+                              console.error("Error:", error);
+                              setEngagementInsight(
+                                "Failed to generate insights"
+                              );
+                            } finally {
+                              setIsLoading(false);
+                            }
                           }}
                           size="sm"
                           className="bg-primary/10 text-primary hover:bg-primary/20"
@@ -487,7 +508,7 @@ export default function AnalysisPage() {
                       </div>
                       {engagementInsight && (
                         <CardDescription className="text-sm mt-2">
-                          {engagementInsight}
+                          <Markdown>{engagementInsight}</Markdown>
                         </CardDescription>
                       )}
                     </CardHeader>
@@ -525,10 +546,31 @@ export default function AnalysisPage() {
                           Content Distribution
                         </CardTitle>
                         <Button
-                          onClick={() => {
+                          onClick={async () => {
                             setPostTypesInsight(
                               "Analyzing content patterns..."
                             );
+                            setIsLoading(true);
+                            try {
+                              const response = await fetch("/api/chat", {
+                                method: "POST",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                  message: `Analyze the content distribution for ${username} account and for ${selectedType} posts, give only 3 short insights`,
+                                }),
+                              });
+                              const data = await response.json();
+                              setPostTypesInsight(data);
+                            } catch (error) {
+                              console.error("Error:", error);
+                              setPostTypesInsight(
+                                "Failed to generate insights"
+                              );
+                            } finally {
+                              setIsLoading(false);
+                            }
                           }}
                           size="sm"
                           className="bg-primary/10 text-primary hover:bg-primary/20"
@@ -538,7 +580,7 @@ export default function AnalysisPage() {
                       </div>
                       {postTypesInsight && (
                         <CardDescription className="text-sm mt-2">
-                          {postTypesInsight}
+                          <Markdown>{postTypesInsight}</Markdown>
                         </CardDescription>
                       )}
                     </CardHeader>
@@ -597,10 +639,29 @@ export default function AnalysisPage() {
                           Performance Metrics
                         </CardTitle>
                         <Button
-                          onClick={() => {
+                          onClick={async () => {
                             setTimingInsight(
                               "Analyzing performance metrics..."
                             );
+                            setIsLoading(true);
+                            try {
+                              const response = await fetch("/api/chat", {
+                                method: "POST",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                  message: `Analyze the performance metrics for ${username} account and for ${selectedType} posts, give only 3 short insights`,
+                                }),
+                              });
+                              const data = await response.json();
+                              setTimingInsight(data);
+                            } catch (error) {
+                              console.error("Error:", error);
+                              setTimingInsight("Failed to generate insights");
+                            } finally {
+                              setIsLoading(false);
+                            }
                           }}
                           size="sm"
                           className="bg-primary/10 text-primary hover:bg-primary/20"
@@ -610,7 +671,7 @@ export default function AnalysisPage() {
                       </div>
                       {timingInsight && (
                         <CardDescription className="text-sm mt-2">
-                          {timingInsight}
+                          <Markdown>{timingInsight}</Markdown>
                         </CardDescription>
                       )}
                     </CardHeader>
