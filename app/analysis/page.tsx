@@ -63,6 +63,9 @@ import {
   Cell,
   BarChart as BChart,
   PieChart,
+  Label,
+  Legend,
+  LabelList,
 } from "recharts";
 
 interface ProfileData {
@@ -142,7 +145,7 @@ export default function AnalysisPage() {
           dataResponse.json(),
           profileResponse.json(),
         ]);
-
+        console.log(postsData);
         setPosts(postsData.posts);
         setProfileData(profileData);
       } catch (err) {
@@ -467,7 +470,7 @@ export default function AnalysisPage() {
                   }`}
                 >
                   {/* Engagement Over Time Chart */}
-                  <Card className="bg-black/50">
+                  <Card className="bg-black/50 border-white/30">
                     <CardHeader>
                       <div className="flex justify-between items-center">
                         <CardTitle className="text-lg">
@@ -516,14 +519,12 @@ export default function AnalysisPage() {
                       <ResponsiveContainer width="100%" height="100%">
                         <AreaChart
                           data={filteredPosts.map((post) => ({
-                            date: new Date(
-                              post.date_time * 1000
-                            ).toLocaleDateString(),
+                            year: new Date(post.date_time).getFullYear(),
                             engagement: post.likes_count + post.comments_count,
                           }))}
                         >
                           <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                          <XAxis dataKey="date" stroke="#fff" />
+                          <XAxis dataKey="year" stroke="#fff" />
                           <YAxis stroke="#fff" />
                           <Tooltip />
                           <Area
@@ -533,13 +534,23 @@ export default function AnalysisPage() {
                             fill="#8B5CF6"
                             fillOpacity={0.3}
                           />
+                          <text
+                            x="50%"
+                            y="10%"
+                            textAnchor="middle"
+                            fill="#fff"
+                            fontSize="18"
+                            fontWeight="bold"
+                          >
+                            Engagement Over Time
+                          </text>
                         </AreaChart>
                       </ResponsiveContainer>
                     </CardContent>
                   </Card>
 
                   {/* Post Types Distribution */}
-                  <Card className="bg-black/50 border-white/10">
+                  <Card className="bg-black/50 border-white/30">
                     <CardHeader>
                       <div className="flex justify-between items-center">
                         <CardTitle className="text-lg">
@@ -626,13 +637,38 @@ export default function AnalysisPage() {
                             ))}
                           </Pie>
                           <Tooltip />
+                          {/* Add title to the chart */}
+                          <text
+                            x="50%"
+                            y="10%"
+                            textAnchor="middle"
+                            fill="#fff"
+                            fontSize="18"
+                            fontWeight="bold"
+                          >
+                            Post Types Distribution
+                          </text>
+                          {/* Add legend at the bottom */}
+                          <Legend
+                            layout="horizontal"
+                            align="center"
+                            verticalAlign="bottom"
+                            iconSize={20}
+                            iconType="circle"
+                            wrapperStyle={{
+                              paddingTop: "10px",
+                              paddingBottom: "10px",
+                              fontSize: "14px",
+                              color: "#fff",
+                            }}
+                          />
                         </PieChart>
                       </ResponsiveContainer>
                     </CardContent>
                   </Card>
 
                   {/* Performance Metrics */}
-                  <Card className="bg-black/50 border-white/10">
+                  <Card className="bg-black/50 border-white/30">
                     <CardHeader>
                       <div className="flex justify-between items-center">
                         <CardTitle className="text-lg">
@@ -689,9 +725,42 @@ export default function AnalysisPage() {
                           <XAxis dataKey="id" stroke="#fff" />
                           <YAxis stroke="#fff" />
                           <Tooltip />
-                          <Bar dataKey="likes" fill="#8B5CF6" />
-                          <Bar dataKey="comments" fill="#EC4899" />
-                          <Bar dataKey="views" fill="#10B981" />
+                          <text
+                            x="50%"
+                            y="10%"
+                            textAnchor="middle"
+                            fill="#fff"
+                            fontSize="18"
+                            fontWeight="bold"
+                          >
+                            Performance Metrics
+                          </text>
+
+                          {/* Add bars with labels */}
+                          <Bar dataKey="likes" fill="#8B5CF6">
+                            {/* Add labels for each bar */}
+                          </Bar>
+                          <Bar dataKey="comments" fill="#EC4899">
+                            {/* Add labels for each bar */}
+                          </Bar>
+                          <Bar dataKey="views" fill="#10B981">
+                            {/* Add labels for each bar */}
+                          </Bar>
+
+                          {/* Add the legend */}
+                          <Legend
+                            layout="horizontal"
+                            align="center"
+                            verticalAlign="bottom"
+                            iconSize={20}
+                            iconType="circle"
+                            wrapperStyle={{
+                              paddingTop: "10px",
+                              paddingBottom: "10px",
+                              fontSize: "14px",
+                              color: "#fff",
+                            }}
+                          />
                         </BChart>
                       </ResponsiveContainer>
                     </CardContent>
@@ -770,7 +839,7 @@ export default function AnalysisPage() {
                             <TableCell className="max-w-xs truncate">
                               {post.description}
                             </TableCell>
-                            <TableCell>{formatDate(post.date_time)}</TableCell>
+                            <TableCell>{post.date_time}</TableCell>
                             <TableCell className="max-w-xs truncate">
                               {post.top_comments}
                             </TableCell>
