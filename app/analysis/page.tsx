@@ -448,7 +448,7 @@ export default function AnalysisPage() {
                           </div>
                           <div className="pl-7">
                             <p className="text-gray-300 whitespace-pre-line leading-relaxed">
-                              {aiResponse}
+                              <Markdown>{aiResponse}</Markdown>
                             </p>
                           </div>
                         </div>
