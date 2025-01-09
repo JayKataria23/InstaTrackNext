@@ -10,7 +10,11 @@ import {
   Eye,
   EyeOff,
   BadgeCheck,
-  Loader2, Sparkles, Search, Bot, AlertCircle 
+  Loader2,
+  Sparkles,
+  Search,
+  Bot,
+  AlertCircle,
 } from "lucide-react";
 import AnimatedBackground from "@/components/animated-background";
 import { Button } from "@/components/ui/button";
@@ -57,7 +61,7 @@ import {
   Pie,
   Cell,
   BarChart as BChart,
-  PieChart
+  PieChart,
 } from "recharts";
 
 interface ProfileData {
@@ -338,284 +342,301 @@ export default function AnalysisPage() {
                   onClick={() => setIsChartsVisible(!isChartsVisible)}
                   variant="outline"
                   className="border-white/20 text-white bg-black hover:bg-white/10"
-                  >
+                >
                   {isChartsVisible ? (
                     <>
-                    <EyeOff className="mr-2 h-4 w-4" />
-                    Hide Charts
+                      <EyeOff className="mr-2 h-4 w-4" />
+                      Hide Charts
                     </>
                   ) : (
                     <>
-                    <Eye className="mr-2 h-4 w-4" />
-                    Show Charts
+                      <Eye className="mr-2 h-4 w-4" />
+                      Show Charts
                     </>
                   )}
-                  </Button>
+                </Button>
               </div>
-<div className="my-8">
-                
-
+              <div className="my-8">
                 {/* Query Input */}
                 <Card className="bg-inherit border-white/10 mb-8 backdrop-blur-sm">
-  <CardHeader className="pb-4">
-    <div className="flex items-center gap-3">
-      <div className="p-2 rounded-lg bg-primary/10">
-        <Sparkles className="h-5 w-5 text-primary" />
-      </div>
-      <div>
-        <CardTitle className="text-xl font-semibold bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
-          AI-Powered Insights
-        </CardTitle>
-        <CardDescription className="text-gray-400">
-          Ask questions about the data and get real-time AI-generated answers
-        </CardDescription>
-      </div>
-    </div>
-  </CardHeader>
-  <CardContent>
-    <div className="space-y-4">
-      <div className="relative">
-        <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-          <Search className="h-5 w-5 text-gray-400" />
-        </div>
-        <Input
-          placeholder="E.g., What's the best time to post?"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="bg-white/5 border-white/10 text-white pl-10 pr-32 h-12 text-lg focus:ring-2 focus:ring-primary/50 transition-all"
-        />
-        <Button
-          onClick={async () => {
-            if (!query) return;
-            setIsLoading(true);
-            try {
-              const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ message: query }),
-              });
-              const data = await response.json();
-              setAiResponse(data);
-            } catch (error) {
-              console.error('Error:', error);
-              setError('Failed to get AI response');
-            } finally {
-              setIsLoading(false);
-            }
-          }}
-          className="absolute right-2 top-2 bottom-2 bg-primary hover:bg-primary/90 transition-all duration-200 px-6"
-          disabled={isLoading || !query.trim()}
-        >
-          {isLoading ? (
-            <div className="flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Thinking...</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4" />
-              <span>Ask AI</span>
-            </div>
-          )}
-        </Button>
-      </div>
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-primary/10">
+                        <Sparkles className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-xl font-semibold bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
+                          AI-Powered Insights
+                        </CardTitle>
+                        <CardDescription className="text-gray-400">
+                          Ask questions about the data and get real-time
+                          AI-generated answers
+                        </CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                          <Search className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <Input
+                          placeholder="E.g., What's the best time to post?"
+                          value={query}
+                          onChange={(e) => setQuery(e.target.value)}
+                          className="bg-white/5 border-white/10 text-white pl-10 pr-32 h-12 text-lg focus:ring-2 focus:ring-primary/50 transition-all"
+                        />
+                        <Button
+                          onClick={async () => {
+                            if (!query) return;
+                            setIsLoading(true);
+                            try {
+                              const response = await fetch("/api/chat", {
+                                method: "POST",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                  message:
+                                    query +
+                                    " answer only for " +
+                                    username +
+                                    " account and for " +
+                                    selectedType +
+                                    " posts",
+                                }),
+                              });
+                              const data = await response.json();
+                              setAiResponse(data);
+                            } catch (error) {
+                              console.error("Error:", error);
+                              setError("Failed to get AI response");
+                            } finally {
+                              setIsLoading(false);
+                            }
+                          }}
+                          className="absolute right-2 top-2 bottom-2 bg-primary hover:bg-primary/90 transition-all duration-200 px-6"
+                          disabled={isLoading || !query.trim()}
+                        >
+                          {isLoading ? (
+                            <div className="flex items-center gap-2">
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              <span>Thinking...</span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <Sparkles className="h-4 w-4" />
+                              <span>Ask AI</span>
+                            </div>
+                          )}
+                        </Button>
+                      </div>
 
-      {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 flex items-center gap-2">
-          <AlertCircle className="h-5 w-5" />
-          <p>{error}</p>
-        </div>
-      )}
+                      {error && (
+                        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 flex items-center gap-2">
+                          <AlertCircle className="h-5 w-5" />
+                          <p>{error}</p>
+                        </div>
+                      )}
 
-      {aiResponse && (
-        <div className="mt-4 p-6 bg-white/5 border border-white/10 rounded-lg space-y-3">
-          <div className="flex items-center gap-2">
-            <Bot className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-medium text-white">AI Response</h3>
-          </div>
-          <div className="pl-7">
-            <p className="text-gray-300 whitespace-pre-line leading-relaxed">{aiResponse}</p>
-          </div>
-        </div>
-      )}
-    </div>
-  </CardContent>
-</Card>
+                      {aiResponse && (
+                        <div className="mt-4 p-6 bg-white/5 border border-white/10 rounded-lg space-y-3">
+                          <div className="flex items-center gap-2">
+                            <Bot className="h-5 w-5 text-primary" />
+                            <h3 className="text-lg font-medium text-white">
+                              AI Response
+                            </h3>
+                          </div>
+                          <div className="pl-7">
+                            <p className="text-gray-300 whitespace-pre-line leading-relaxed">
+                              {aiResponse}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
 
                 {/* Charts Section */}
                 <div
                   className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-all duration-300 ${
-                  isChartsVisible ? "block" : "hidden"
+                    isChartsVisible ? "block" : "hidden"
                   }`}
                 >
                   {/* Engagement Over Time Chart */}
-                  <Card className="bg-black/50 border-white/10">
-                  <CardHeader>
-                    <div className="flex justify-between items-center">
-                    <CardTitle className="text-lg">
-                      Engagement Over Time
-                    </CardTitle>
-                    <Button
-                      onClick={() => {
-                      // Add your insight generation logic here
-                      setEngagementInsight("Analyzing engagement over time...");
-                      }}
-                      size="sm"
-                      className="bg-primary/10 text-primary hover:bg-primary/20"
-                    >
-                      ✨ Generate Insights
-                    </Button>
-                    </div>
-                    {engagementInsight && (
-                    <CardDescription className="text-sm mt-2">
-                      {engagementInsight}
-                    </CardDescription>
-                    )}
-                  </CardHeader>
-                  <CardContent className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart
-                      data={filteredPosts.map((post) => ({
-                      date: new Date(
-                        post.date_time * 1000
-                      ).toLocaleDateString(),
-                      engagement: post.likes_count + post.comments_count,
-                      }))}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                      <XAxis dataKey="date" stroke="#fff" />
-                      <YAxis stroke="#fff" />
-                      <Tooltip />
-                      <Area
-                      type="monotone"
-                      dataKey="engagement"
-                      stroke="#8B5CF6"
-                      fill="#8B5CF6"
-                      fillOpacity={0.3}
-                      />
-                    </AreaChart>
-                    </ResponsiveContainer>
-                  </CardContent>
+                  <Card className="bg-black/50 border-</div>white/10">
+                    <CardHeader>
+                      <div className="flex justify-between items-center">
+                        <CardTitle className="text-lg">
+                          Engagement Over Time
+                        </CardTitle>
+                        <Button
+                          onClick={() => {
+                            // Add your insight generation logic here
+                            setEngagementInsight(
+                              "Analyzing engagement over time..."
+                            );
+                          }}
+                          size="sm"
+                          className="bg-primary/10 text-primary hover:bg-primary/20"
+                        >
+                          ✨ Generate Insights
+                        </Button>
+                      </div>
+                      {engagementInsight && (
+                        <CardDescription className="text-sm mt-2">
+                          {engagementInsight}
+                        </CardDescription>
+                      )}
+                    </CardHeader>
+                    <CardContent className="h-[300px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart
+                          data={filteredPosts.map((post) => ({
+                            date: new Date(
+                              post.date_time * 1000
+                            ).toLocaleDateString(),
+                            engagement: post.likes_count + post.comments_count,
+                          }))}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                          <XAxis dataKey="date" stroke="#fff" />
+                          <YAxis stroke="#fff" />
+                          <Tooltip />
+                          <Area
+                            type="monotone"
+                            dataKey="engagement"
+                            stroke="#8B5CF6"
+                            fill="#8B5CF6"
+                            fillOpacity={0.3}
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </CardContent>
                   </Card>
 
                   {/* Post Types Distribution */}
                   <Card className="bg-black/50 border-white/10">
-                  <CardHeader>
-                    <div className="flex justify-between items-center">
-                    <CardTitle className="text-lg">
-                      Content Distribution
-                    </CardTitle>
-                    <Button
-                      onClick={() => {
-                      setPostTypesInsight("Analyzing content patterns...");
-                      }}
-                      size="sm"
-                      className="bg-primary/10 text-primary hover:bg-primary/20"
-                    >
-                      ✨ Generate Insights
-                    </Button>
-                    </div>
-                    {postTypesInsight && (
-                    <CardDescription className="text-sm mt-2">
-                      {postTypesInsight}
-                    </CardDescription>
-                    )}
-                  </CardHeader>
-                  <CardContent className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                      data={Array.from(
-                        filteredPosts.reduce((acc, post) => {
-                        const type = post.type.startsWith("Graph")
-                          ? post.type.slice(5).trim()
-                          : post.type;
-                        acc.set(type, (acc.get(type) || 0) + 1);
-                        return acc;
-                        }, new Map()),
-                        ([name, value]) => ({ name, value })
+                    <CardHeader>
+                      <div className="flex justify-between items-center">
+                        <CardTitle className="text-lg">
+                          Content Distribution
+                        </CardTitle>
+                        <Button
+                          onClick={() => {
+                            setPostTypesInsight(
+                              "Analyzing content patterns..."
+                            );
+                          }}
+                          size="sm"
+                          className="bg-primary/10 text-primary hover:bg-primary/20"
+                        >
+                          ✨ Generate Insights
+                        </Button>
+                      </div>
+                      {postTypesInsight && (
+                        <CardDescription className="text-sm mt-2">
+                          {postTypesInsight}
+                        </CardDescription>
                       )}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={80}
-                      >
-                      {Array.from(
-                        filteredPosts.reduce((acc, post) => {
-                        const type = post.type.startsWith("Graph")
-                          ? post.type.slice(5).trim()
-                          : post.type;
-                        acc.set(type, (acc.get(type) || 0) + 1);
-                        return acc;
-                        }, new Map())
-                      ).map(([name], index) => (
-                        <Cell
-                        key={`cell-${index}`}
-                        fill={
-                          index % 3 === 2
-                          ? "#10B981"
-                          : index % 3 === 1
-                          ? "#EC4899"
-                          : "#8B5CF6"
-                        }
-                        />
-                      ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                    </ResponsiveContainer>
-                  </CardContent>
+                    </CardHeader>
+                    <CardContent className="h-[300px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={Array.from(
+                              filteredPosts.reduce((acc, post) => {
+                                const type = post.type.startsWith("Graph")
+                                  ? post.type.slice(5).trim()
+                                  : post.type;
+                                acc.set(type, (acc.get(type) || 0) + 1);
+                                return acc;
+                              }, new Map()),
+                              ([name, value]) => ({ name, value })
+                            )}
+                            dataKey="value"
+                            nameKey="name"
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={80}
+                          >
+                            {Array.from(
+                              filteredPosts.reduce((acc, post) => {
+                                const type = post.type.startsWith("Graph")
+                                  ? post.type.slice(5).trim()
+                                  : post.type;
+                                acc.set(type, (acc.get(type) || 0) + 1);
+                                return acc;
+                              }, new Map())
+                            ).map(([name], index) => (
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={
+                                  index % 3 === 2
+                                    ? "#10B981"
+                                    : index % 3 === 1
+                                    ? "#EC4899"
+                                    : "#8B5CF6"
+                                }
+                              />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </CardContent>
                   </Card>
 
                   {/* Performance Metrics */}
                   <Card className="bg-black/50 border-white/10">
-                  <CardHeader>
-                    <div className="flex justify-between items-center">
-                    <CardTitle className="text-lg">
-                      Performance Metrics
-                    </CardTitle>
-                    <Button
-                      onClick={() => {
-                      setTimingInsight("Analyzing performance metrics...");
-                      }}
-                      size="sm"
-                      className="bg-primary/10 text-primary hover:bg-primary/20"
-                    >
-                      ✨ Generate Insights
-                    </Button>
-                    </div>
-                    {timingInsight && (
-                    <CardDescription className="text-sm mt-2">
-                      {timingInsight}
-                    </CardDescription>
-                    )}
-                  </CardHeader>
-                  <CardContent className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                    <BChart
-                      data={filteredPosts.slice(-10).map((post) => ({
-                      id: post.post_id,
-                      likes: post.likes_count,
-                      comments: post.comments_count,
-                      views: post.views_count,
-                      }))}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                      <XAxis dataKey="id" stroke="#fff" />
-                      <YAxis stroke="#fff" />
-                      <Tooltip />
-                      <Bar dataKey="likes" fill="#8B5CF6" />
-                      <Bar dataKey="comments" fill="#EC4899" />
-                      <Bar dataKey="views" fill="#10B981" />
-                    </BChart>
-                    </ResponsiveContainer>
-                  </CardContent>
+                    <CardHeader>
+                      <div className="flex justify-between items-center">
+                        <CardTitle className="text-lg">
+                          Performance Metrics
+                        </CardTitle>
+                        <Button
+                          onClick={() => {
+                            setTimingInsight(
+                              "Analyzing performance metrics..."
+                            );
+                          }}
+                          size="sm"
+                          className="bg-primary/10 text-primary hover:bg-primary/20"
+                        >
+                          ✨ Generate Insights
+                        </Button>
+                      </div>
+                      {timingInsight && (
+                        <CardDescription className="text-sm mt-2">
+                          {timingInsight}
+                        </CardDescription>
+                      )}
+                    </CardHeader>
+                    <CardContent className="h-[300px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BChart
+                          data={filteredPosts.slice(-10).map((post) => ({
+                            id: post.post_id,
+                            likes: post.likes_count,
+                            comments: post.comments_count,
+                            views: post.views_count,
+                          }))}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                          <XAxis dataKey="id" stroke="#fff" />
+                          <YAxis stroke="#fff" />
+                          <Tooltip />
+                          <Bar dataKey="likes" fill="#8B5CF6" />
+                          <Bar dataKey="comments" fill="#EC4899" />
+                          <Bar dataKey="views" fill="#10B981" />
+                        </BChart>
+                      </ResponsiveContainer>
+                    </CardContent>
                   </Card>
                 </div>
-                </div>
+              </div>
               <div
                 className={`rounded-lg border border-white/10 overflow-hidden transition-all duration-300 ${
                   isTableVisible ? "max-h-screen" : "max-h-0 overflow-hidden"
@@ -749,7 +770,6 @@ export default function AnalysisPage() {
                 </div>
               </div>
               {/* Data Visualization Section */}
-                
             </CardContent>
           </Card>
         </div>
